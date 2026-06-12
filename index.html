@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>BarberApp - Super Administrador</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-152.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="BarberApp">
+    <meta name="theme-color" content="#0f172a">
+    <meta name="description" content="Plataforma de gestión de reservas para barberías">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}body{font-family:'Segoe UI',Roboto,sans-serif;background:#0f172a;min-height:100vh;padding:20px}.container{max-width:1400px;margin:0 auto}
+        @media(max-width:768px){body{padding:10px}.admin-header{flex-direction:column;gap:15px;text-align:center}.tabs{justify-content:center}.tab-btn{padding:8px 16px;font-size:14px}.stats-grid{grid-template-columns:1fr 1fr;gap:10px}.stat-card{padding:12px}.stat-number{font-size:24px}.barberia-card,.dueno-card,.reserva-card{flex-direction:column;text-align:center}.barberia-actions,.dueno-actions,.reserva-actions{justify-content:center}.form-row{grid-template-columns:1fr}.modal-content{padding:20px}}
+        @media(max-width:480px){.stats-grid{grid-template-columns:1fr}.tab-btn{padding:6px 12px;font-size:12px}}
+        .auth-container{max-width:400px;margin:80px auto;background:#fff;border-radius:28px;padding:40px;box-shadow:0 20px 40px rgba(0,0,0,0.2)}.auth-title{font-size:32px;font-weight:800;text-align:center;margin-bottom:30px;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;background-clip:text;color:transparent}.input-group{margin-bottom:20px}.input-group input{width:100%;padding:14px 18px;border:2px solid #e2e8f0;border-radius:16px;font-size:16px}.auth-btn{width:100%;padding:14px;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;border-radius:40px;font-weight:600;cursor:pointer}
+        .admin-header{background:#fff;border-radius:24px;padding:20px 28px;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;box-shadow:0 8px 20px rgba(0,0,0,0.1)}.logo{font-size:26px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;background-clip:text;color:transparent}.badge-role{background:#fef3c7;color:#d97706;padding:6px 14px;border-radius:40px;font-size:13px;font-weight:600}.logout-btn{background:#ef4444;color:#fff;border:none;padding:8px 20px;border-radius:40px;cursor:pointer}
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;margin-bottom:35px}.stat-card{background:#fff;padding:20px;border-radius:24px;border-left:5px solid #667eea;box-shadow:0 2px 5px rgba(0,0,0,0.1)}.stat-number{font-size:38px;font-weight:800;color:#0f172a}.stat-label{color:#475569;font-size:14px;margin-top:8px}
+        .tabs{display:flex;gap:12px;margin-bottom:25px;flex-wrap:wrap}.tab-btn{background:#fff;border:none;padding:12px 28px;border-radius:40px;font-weight:600;cursor:pointer;color:#334155;transition:all .3s;box-shadow:0 1px 3px rgba(0,0,0,0.1)}.tab-btn.active{background:#667eea;color:#fff}
+        .tab-panel{display:none;background:#fff;border-radius:28px;padding:24px;box-shadow:0 8px 20px rgba(0,0,0,0.05)}.tab-panel.active-panel{display:block}
+        
+        /* Barberías - Tarjetas */
+        .barberias-container{display:flex;flex-direction:column;gap:16px}
+        .barberia-card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:5px solid #667eea;transition:all .3s;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}.barberia-card:hover{box-shadow:0 8px 25px rgba(0,0,0,0.1);transform:translateY(-2px)}
+        .barberia-info{flex:1;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+        .barberia-item{display:flex;flex-direction:column;min-width:160px}
+        .barberia-item-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+        .barberia-item-value{font-size:15px;font-weight:500;color:#1e293b}
+        .barberia-status{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}.status-active{background:#dcfce7;color:#15803d}.status-inactive{background:#fee2e2;color:#b91c1c}
+        .barberia-actions{display:flex;gap:8px}
+        
+        /* Dueños - Tarjetas */
+        .duenos-container{display:flex;flex-direction:column;gap:16px}
+        .dueno-card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:5px solid #f59e0b;transition:all .3s;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}.dueno-card:hover{box-shadow:0 8px 25px rgba(0,0,0,0.1);transform:translateY(-2px)}
+        .dueno-info{flex:1;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+        .dueno-item{display:flex;flex-direction:column;min-width:180px}
+        .dueno-item-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+        .dueno-item-value{font-size:15px;font-weight:500;color:#1e293b}
+        .dueno-actions{display:flex;gap:8px}
+        
+        /* Reservas Globales - Tarjetas */
+        .reservas-container{display:flex;flex-direction:column;gap:16px}
+        .reserva-card{background:#fff;border-radius:20px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,0.08);border-left:5px solid #10b981;transition:all .3s;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:15px}.reserva-card:hover{box-shadow:0 8px 25px rgba(0,0,0,0.1);transform:translateY(-2px)}
+        .reserva-info{flex:1;display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+        .reserva-item{display:flex;flex-direction:column;min-width:120px}
+        .reserva-item-label{font-size:11px;font-weight:600;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+        .reserva-item-value{font-size:14px;font-weight:500;color:#1e293b}
+        .reserva-precio{background:#dcfce7;color:#15803d;padding:4px 12px;border-radius:20px;font-weight:700;font-size:14px;display:inline-block}
+        .reserva-estado{display:inline-block;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600;background:#dbeafe;color:#1e40af}
+        
+        /* Filtros */
+        .filter-bar{display:flex;gap:10px;margin-bottom:20px;flex-wrap:wrap;align-items:center}.filter-input{padding:10px 14px;border:1px solid #e2e8f0;border-radius:12px;flex:1;min-width:150px;font-size:14px;transition:all .2s;background:#fff}.filter-input:focus{outline:none;border-color:#667eea;box-shadow:0 0 0 3px rgba(102,126,234,0.1)}
+        .filter-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px}
+        .filter-header h3{margin:0;color:#1e293b}
+        .sort-buttons{display:flex;gap:8px}
+        .sort-chip{background:#f1f5f9;border:none;padding:6px 14px;border-radius:30px;font-size:12px;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:6px}.sort-chip.active{background:#667eea;color:#fff}.sort-chip:hover:not(.active){background:#e2e8f0}
+        
+        .form-gestor{background:#f8fafc;padding:25px;border-radius:20px;margin-bottom:30px}.form-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:20px;margin-bottom:20px}.form-group{display:flex;flex-direction:column;gap:8px}.form-group label{font-weight:600;color:#334155}.form-group input,.form-group select{padding:12px;border-radius:12px;border:1px solid #cbd5e1;font-size:14px}
+        .btn-primary{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border:none;padding:12px 24px;border-radius:40px;font-weight:600;cursor:pointer}.btn-secondary{background:#3b82f6;color:#fff;border:none;padding:8px 16px;border-radius:40px;cursor:pointer}.btn-danger{background:#ef4444;color:#fff;border:none;padding:8px 16px;border-radius:40px;cursor:pointer}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;z-index:2000}.modal-content{background:#fff;padding:30px;border-radius:28px;max-width:500px;width:90%;max-height:90vh;overflow-y:auto}.modal-buttons{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;flex-wrap:wrap}
+        .toast{position:fixed;bottom:25px;right:25px;background:#1e293b;color:#fff;padding:14px 24px;border-radius:60px;z-index:1000;animation:fadeIn .2s}.toast.success{background:#10b981}.toast.error{background:#ef4444}.toast.info{background:#3b82f6}@keyframes fadeIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+        .btn-icon{background:#f1f5f9;border:none;padding:8px;border-radius:50%;cursor:pointer;transition:all .2s;width:36px;height:36px;display:flex;align-items:center;justify-content:center}.btn-icon:hover{background:#e2e8f0}
+        .loading{text-align:center;padding:40px;color:#64748b}
+    </style>
+</head>
+<body>
+<div class="container">
+    <div id="authScreen" class="auth-container">
+        <div class="auth-title">👑 Super Admin BarberApp</div>
+        <div class="input-group"><input type="email" id="email" placeholder="Correo electrónico"></div>
+        <div class="input-group"><input type="password" id="password" placeholder="Contraseña"></div>
+        <button class="auth-btn" id="loginBtn">Acceder al Panel</button>
+        <p style="text-align:center;margin-top:20px;font-size:13px;">Solo usuarios con rol "superadmin"</p>
+    </div>
+    <div id="panelContent" style="display:none;">
+        <div class="admin-header"><div class="logo">👑 BarberApp Super Admin</div><div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;"><span class="badge-role" id="userRoleBadge">SUPER ADMIN</span><span id="userName"></span><button class="logout-btn" id="logoutBtn">Cerrar Sesión</button></div></div>
+        <div class="stats-grid"><div class="stat-card"><div class="stat-number" id="totalBarberias">0</div><div class="stat-label">Total Barberías</div></div><div class="stat-card"><div class="stat-number" id="totalDueños">0</div><div class="stat-label">Dueños Registrados</div></div><div class="stat-card"><div class="stat-number" id="totalReservasGlobal">0</div><div class="stat-label">Reservas Totales</div></div><div class="stat-card"><div class="stat-number" id="totalClientesGlobal">0</div><div class="stat-label">Clientes Registrados</div></div></div>
+        <div class="tabs"><button class="tab-btn active" data-tab="barberias">🏪 Barberías</button><button class="tab-btn" data-tab="dueños">👨‍💼 Dueños</button><button class="tab-btn" data-tab="reservas">📋 Reservas Globales</button><button class="tab-btn" data-tab="crear">➕ Crear Barbería/Dueño</button></div>
+        
+        <!-- Barberías -->
+        <div id="tab-barberias" class="tab-panel active-panel">
+            <div class="filter-header">
+                <h3>🏪 Todas las Barberías del Sistema</h3>
+                <div class="sort-buttons">
+                    <button class="sort-chip" data-sort-barberias="nombre">📛 Ordenar por Nombre</button>
+                    <button class="sort-chip" data-sort-barberias="estado">📌 Ordenar por Estado</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="filterBarberiaNombre" class="filter-input" placeholder="🔍 Filtrar por nombre...">
+                <input type="text" id="filterBarberiaDireccion" class="filter-input" placeholder="🔍 Filtrar por dirección...">
+                <button id="limpiarFiltrosBarberiasBtn" class="btn-secondary" style="background:#64748b;">Limpiar</button>
+            </div>
+            <div id="barberiasList" class="barberias-container">Cargando...</div>
+        </div>
+        
+        <!-- Dueños -->
+        <div id="tab-dueños" class="tab-panel">
+            <div class="filter-header">
+                <h3>👨‍💼 Dueños Registrados</h3>
+                <div class="sort-buttons">
+                    <button class="sort-chip" data-sort-duenos="nombre">📛 Ordenar por Nombre</button>
+                    <button class="sort-chip" data-sort-duenos="email">✉️ Ordenar por Email</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="filterDuenoNombre" class="filter-input" placeholder="🔍 Filtrar por nombre...">
+                <input type="text" id="filterDuenoEmail" class="filter-input" placeholder="🔍 Filtrar por email...">
+                <button id="limpiarFiltrosDuenosBtn" class="btn-secondary" style="background:#64748b;">Limpiar</button>
+            </div>
+            <p style="margin-bottom:15px;color:#ef4444;font-size:13px;">⚠️ Eliminar un dueño también eliminará su barbería, barberos y servicios asociados</p>
+            <div id="dueñosList" class="duenos-container">Cargando...</div>
+        </div>
+        
+        <!-- Reservas Globales -->
+        <div id="tab-reservas" class="tab-panel">
+            <div class="filter-header">
+                <h3>📋 Reservas de Todo el Sistema</h3>
+                <div class="sort-buttons">
+                    <button class="sort-chip" data-sort-reservas="fecha">📅 Ordenar por Fecha</button>
+                    <button class="sort-chip" data-sort-reservas="barberia">🏪 Ordenar por Barbería</button>
+                    <button class="sort-chip" data-sort-reservas="precio">💰 Ordenar por Precio</button>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" id="filterReservaBarberia" class="filter-input" placeholder="🔍 Filtrar por barbería...">
+                <input type="text" id="filterReservaCliente" class="filter-input" placeholder="🔍 Filtrar por cliente...">
+                <input type="date" id="filterReservaFecha" class="filter-input" style="width:auto;">
+                <button id="limpiarFiltrosReservasBtn" class="btn-secondary" style="background:#64748b;">Limpiar</button>
+            </div>
+            <div id="reservasGlobalList" class="reservas-container">Cargando...</div>
+        </div>
+        
+        <!-- Crear Barbería/Dueño -->
+        <div id="tab-crear" class="tab-panel">
+            <h3 style="margin-bottom:20px;">➕ Registrar Nueva Barbería y Dueño</h3>
+            <div class="form-gestor"><h4 style="margin-bottom:15px;">📝 Datos de la Barbería</h4><div class="form-row"><div class="form-group"><label>Nombre de la Barbería *</label><input type="text" id="nuevaBarberiaNombre" placeholder="Ej: Barbería El Progreso"></div><div class="form-group"><label>Dirección</label><input type="text" id="nuevaBarberiaDireccion" placeholder="Calle, número, ciudad"></div></div><div class="form-row"><div class="form-group"><label>Teléfono</label><input type="text" id="nuevaBarberiaTelefono" placeholder="Ej: +34 612 345 678"></div><div class="form-group"><label>Email de contacto</label><input type="email" id="nuevaBarberiaEmail" placeholder="contacto@barberia.com"></div></div><div class="form-group"><label>Horario</label><input type="text" id="nuevaBarberiaHorario" placeholder="Ej: Lun-Vie 9:00-20:00, Sáb 10:00-18:00"></div></div>
+            <div class="form-gestor"><h4 style="margin-bottom:15px;">👨‍💼 Datos del Dueño</h4><div class="form-row"><div class="form-group"><label>Nombre completo *</label><input type="text" id="nuevoDuenoNombre" placeholder="Ej: Juan Pérez"></div><div class="form-group"><label>Email *</label><input type="email" id="nuevoDuenoEmail" placeholder="dueño@barberia.com"></div></div><div class="form-row"><div class="form-group"><label>Contraseña *</label><input type="password" id="nuevoDuenoPassword" placeholder="Mínimo 6 caracteres"></div></div><button class="btn-primary" id="crearBarberiaYDuenoBtn">✅ Crear Barbería y Dueño</button></div>
+        </div>
+    </div>
+</div>
+<div id="editBarberiaModal" class="modal"><div class="modal-content"><h3>✏️ Editar Barbería</h3><input type="hidden" id="editBarberiaId"><div class="form-group"><label>Nombre</label><input type="text" id="editBarberiaNombre"></div><div class="form-group"><label>Dirección</label><input type="text" id="editBarberiaDireccion"></div><div class="form-group"><label>Teléfono</label><input type="text" id="editBarberiaTelefono"></div><div class="form-group"><label>Email</label><input type="email" id="editBarberiaEmail"></div><div class="form-group"><label>Horario</label><input type="text" id="editBarberiaHorario"></div><div class="form-group"><label>Estado</label><select id="editBarberiaActiva"><option value="true">Activa</option><option value="false">Inactiva</option></select></div><div class="modal-buttons"><button class="btn-secondary" id="closeEditModalBtn">Cancelar</button><button class="btn-primary" id="saveBarberiaEditBtn">Guardar Cambios</button></div></div></div>
+<div id="deleteDuenoModal" class="modal"><div class="modal-content"><h3>⚠️ Eliminar Dueño y Barbería</h3><p style="margin:15px 0;color:#ef4444;">Esta acción es IRREVERSIBLE. Se eliminará:</p><ul style="margin-left:20px;color:#475569;"><li>La barbería completa</li><li>Todos los barberos de esa barbería</li><li>Todos los servicios de esa barbería</li><li>Todas las reservas de esa barbería</li></ul><p style="margin:15px 0;font-weight:bold;" id="deleteInfo"></p><div class="modal-buttons"><button class="btn-secondary" id="closeDeleteModalBtn">Cancelar</button><button class="btn-danger" id="confirmDeleteBtn">Eliminar Permanentemente</button></div></div></div>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, signOut, createUserWithEmailAndPassword, setPersistence, browserLocalPersistence, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, query, where, getDocs, updateDoc, doc, deleteDoc, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+const firebaseConfig = { apiKey: "AIzaSyClzJVINdQW5De4AFT6obEDuLEXPEvc62A", authDomain: "firetvlithgow.firebaseapp.com", databaseURL: "https://firetvlithgow-default-rtdb.firebaseio.com", projectId: "firetvlithgow", storageBucket: "firetvlithgow.firebasestorage.app", messagingSenderId: "521928350411", appId: "1:521928350411:web:dd233890e4b108e820194e" };
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+setPersistence(auth, browserLocalPersistence);
+let currentUser=null, allBarberias=[], allDueños=[], allReservasGlobal=[], duenoParaEliminar=null, barberiasUnsubscribe=null, reservasUnsubscribe=null, dueñosUnsubscribe=null;
+let barberiasSortColumn="nombre", barberiasSortDirection="asc";
+let duenosSortColumn="nombre", duenosSortDirection="asc";
+let reservasSortColumn="fecha", reservasSortDirection="desc";
+function showToast(m,t){const toast=document.createElement("div");toast.className=`toast ${t}`;toast.innerText=m;document.body.appendChild(toast);setTimeout(()=>toast.remove(),3000);}
+document.querySelectorAll('.tab-btn').forEach(btn=>btn.addEventListener('click',()=>{document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active-panel'));document.getElementById(`tab-${btn.dataset.tab}`).classList.add('active-panel');}));
+function iniciarEscuchaBarberias(){if(barberiasUnsubscribe)barberiasUnsubscribe();barberiasUnsubscribe=onSnapshot(collection(db,"barberias"),(snap)=>{allBarberias=snap.docs.map(d=>({id:d.id,...d.data()}));aplicarFiltrosBarberias();loadDueños();updateGlobalStats();});}
+function iniciarEscuchaReservas(){if(reservasUnsubscribe)reservasUnsubscribe();reservasUnsubscribe=onSnapshot(collection(db,"reservas"),(snap)=>{allReservasGlobal=snap.docs.map(d=>({id:d.id,...d.data()}));aplicarFiltrosReservas();updateGlobalStats();});}
+function iniciarEscuchaDueños(){if(dueñosUnsubscribe)dueñosUnsubscribe();dueñosUnsubscribe=onSnapshot(query(collection(db,"usuarios"),where("rol","==","dueño")),(snap)=>{allDueños=snap.docs.map(d=>({id:d.id,...d.data()}));aplicarFiltrosDueños();updateGlobalStats();});}
+document.getElementById('loginBtn')?.addEventListener('click',async()=>{const e=document.getElementById('email').value,p=document.getElementById('password').value;if(!e||!p){showToast("Ingrese email y contraseña","error");return}try{const uc=await signInWithEmailAndPassword(auth,e,p);const snap=await getDocs(query(collection(db,"usuarios"),where("uid","==",uc.user.uid)));if(snap.empty){await signOut(auth);showToast("Usuario no encontrado","error");return}const userData=snap.docs[0].data();if(userData.rol!=="superadmin"){await signOut(auth);showToast("Acceso denegado: no tienes permisos de super administrador","error");return}currentUser={email:e,rol:userData.rol,nombre:userData.nombre};document.getElementById("userName").innerText=currentUser.nombre;document.getElementById("authScreen").style.display="none";document.getElementById("panelContent").style.display="block";iniciarEscuchaBarberias();iniciarEscuchaReservas();iniciarEscuchaDueños();showToast(`Bienvenido Super Admin ${currentUser.nombre}`,"success");}catch(e){showToast("Error: "+e.message,"error");}});
+document.getElementById('logoutBtn')?.addEventListener('click',async()=>{if(barberiasUnsubscribe)barberiasUnsubscribe();if(reservasUnsubscribe)reservasUnsubscribe();if(dueñosUnsubscribe)dueñosUnsubscribe();await signOut(auth);currentUser=null;document.getElementById("authScreen").style.display="block";document.getElementById("panelContent").style.display="none";});
+function aplicarFiltrosBarberias(){let barberias=[...allBarberias];const filtroNombre=document.getElementById('filterBarberiaNombre')?.value.toLowerCase()||'';const filtroDireccion=document.getElementById('filterBarberiaDireccion')?.value.toLowerCase()||'';if(filtroNombre)barberias=barberias.filter(b=>(b.nombre||'').toLowerCase().includes(filtroNombre));if(filtroDireccion)barberias=barberias.filter(b=>(b.direccion||'').toLowerCase().includes(filtroDireccion));barberias.sort((a,b)=>{let valA,valB;if(barberiasSortColumn==="nombre"){valA=a.nombre||"";valB=b.nombre||"";}else{valA=a.activa!==false?1:0;valB=b.activa!==false?1:0;}if(valA<valB)return barberiasSortDirection==="asc"?-1:1;if(valA>valB)return barberiasSortDirection==="asc"?1:-1;return 0;});renderBarberias(barberias);}
+function renderBarberias(barberias){const c=document.getElementById("barberiasList");if(!barberias.length){c.innerHTML="<p class='loading'>No hay barberías registradas</p>";return}c.innerHTML=barberias.map(b=>`<div class="barberia-card"><div class="barberia-info"><div class="barberia-item"><span class="barberia-item-label">🏪 NOMBRE</span><span class="barberia-item-value"><strong>${b.nombre||'---'}</strong></span></div><div class="barberia-item"><span class="barberia-item-label">📍 DIRECCIÓN</span><span class="barberia-item-value">${b.direccion||'---'}</span></div><div class="barberia-item"><span class="barberia-item-label">📞 TELÉFONO</span><span class="barberia-item-value">${b.telefono||'---'}</span></div><div class="barberia-item"><span class="barberia-item-label">✉️ EMAIL</span><span class="barberia-item-value">${b.email||'---'}</span></div><div class="barberia-item"><span class="barberia-item-label">📌 ESTADO</span><span class="barberia-status ${b.activa!==false?'status-active':'status-inactive'}">${b.activa!==false?'ACTIVA':'INACTIVA'}</span></div></div><div class="barberia-actions"><button class="btn-secondary edit-barberia" data-id="${b.id}">✏️ Editar</button><button class="btn-danger delete-barberia" data-id="${b.id}">🗑️ Eliminar</button></div></div>`).join("");document.querySelectorAll('.edit-barberia').forEach(btn=>btn.addEventListener('click',()=>openEditBarberiaModal(allBarberias.find(b=>b.id===btn.dataset.id))));document.querySelectorAll('.delete-barberia').forEach(btn=>btn.addEventListener('click',async()=>{if(confirm("¿Eliminar esta barbería? Esto también eliminará sus barberos y servicios.")){await deleteDoc(doc(db,"barberias",btn.dataset.id));showToast("Barbería eliminada","success");}}));}
+document.querySelectorAll('.sort-chip[data-sort-barberias]').forEach(chip=>{chip.addEventListener('click',()=>{const col=chip.dataset.sortBarberias;if(barberiasSortColumn===col){barberiasSortDirection=barberiasSortDirection==="asc"?"desc":"asc";}else{barberiasSortColumn=col;barberiasSortDirection="asc";}aplicarFiltrosBarberias();document.querySelectorAll('.sort-chip[data-sort-barberias]').forEach(c=>c.classList.remove('active'));chip.classList.add('active');});});
+document.getElementById('filterBarberiaNombre')?.addEventListener('input',()=>aplicarFiltrosBarberias());
+document.getElementById('filterBarberiaDireccion')?.addEventListener('input',()=>aplicarFiltrosBarberias());
+document.getElementById('limpiarFiltrosBarberiasBtn')?.addEventListener('click',()=>{if(document.getElementById('filterBarberiaNombre'))document.getElementById('filterBarberiaNombre').value='';if(document.getElementById('filterBarberiaDireccion'))document.getElementById('filterBarberiaDireccion').value='';aplicarFiltrosBarberias();});
+function aplicarFiltrosDueños(){let dueños=[...allDueños];const filtroNombre=document.getElementById('filterDuenoNombre')?.value.toLowerCase()||'';const filtroEmail=document.getElementById('filterDuenoEmail')?.value.toLowerCase()||'';if(filtroNombre)dueños=dueños.filter(d=>(d.nombre||'').toLowerCase().includes(filtroNombre));if(filtroEmail)dueños=dueños.filter(d=>(d.email||'').toLowerCase().includes(filtroEmail));dueños.sort((a,b)=>{let valA,valB;if(duenosSortColumn==="nombre"){valA=a.nombre||"";valB=b.nombre||"";}else{valA=a.email||"";valB=b.email||"";}if(valA<valB)return duenosSortDirection==="asc"?-1:1;if(valA>valB)return duenosSortDirection==="asc"?1:-1;return 0;});renderDueños(dueños);}
+function renderDueños(dueños){const c=document.getElementById("dueñosList");if(!dueños.length){c.innerHTML="<p class='loading'>No hay dueños registrados</p>";return}c.innerHTML=dueños.map(d=>{const bar=allBarberias.find(b=>b.id===d.barberiaId);return`<div class="dueno-card"><div class="dueno-info"><div class="dueno-item"><span class="dueno-item-label">👨‍💼 NOMBRE</span><span class="dueno-item-value"><strong>${d.nombre||'---'}</strong></span></div><div class="dueno-item"><span class="dueno-item-label">✉️ EMAIL</span><span class="dueno-item-value">${d.email||'---'}</span></div><div class="dueno-item"><span class="dueno-item-label">🏪 BARBERÍA</span><span class="dueno-item-value">${bar?bar.nombre:'No asignada'}</span></div><div class="dueno-item"><span class="dueno-item-label">📅 REGISTRO</span><span class="dueno-item-value">${d.createdAt?new Date(d.createdAt.seconds*1000).toLocaleDateString():'---'}</span></div></div><div class="dueno-actions"><button class="btn-danger delete-dueno" data-uid="${d.uid}" data-nombre="${d.nombre}" data-barberiaid="${d.barberiaId}" data-docid="${d.id}">🗑️ Eliminar Dueño</button></div></div>`;}).join("");document.querySelectorAll('.delete-dueno').forEach(btn=>btn.addEventListener('click',()=>{duenoParaEliminar={uid:btn.dataset.uid,nombre:btn.dataset.nombre,barberiaId:btn.dataset.barberiaid,docId:btn.dataset.docid};document.getElementById('deleteInfo').innerHTML=`Dueño: <strong>${duenoParaEliminar.nombre}</strong><br>UID: ${duenoParaEliminar.uid}`;document.getElementById('deleteDuenoModal').style.display='flex';}));}
+document.querySelectorAll('.sort-chip[data-sort-duenos]').forEach(chip=>{chip.addEventListener('click',()=>{const col=chip.dataset.sortDuenos;if(duenosSortColumn===col){duenosSortDirection=duenosSortDirection==="asc"?"desc":"asc";}else{duenosSortColumn=col;duenosSortDirection="asc";}aplicarFiltrosDueños();document.querySelectorAll('.sort-chip[data-sort-duenos]').forEach(c=>c.classList.remove('active'));chip.classList.add('active');});});
+document.getElementById('filterDuenoNombre')?.addEventListener('input',()=>aplicarFiltrosDueños());
+document.getElementById('filterDuenoEmail')?.addEventListener('input',()=>aplicarFiltrosDueños());
+document.getElementById('limpiarFiltrosDuenosBtn')?.addEventListener('click',()=>{if(document.getElementById('filterDuenoNombre'))document.getElementById('filterDuenoNombre').value='';if(document.getElementById('filterDuenoEmail'))document.getElementById('filterDuenoEmail').value='';aplicarFiltrosDueños();});
+function aplicarFiltrosReservas(){let reservas=[...allReservasGlobal];const filtroBarberia=document.getElementById('filterReservaBarberia')?.value.toLowerCase()||'';const filtroCliente=document.getElementById('filterReservaCliente')?.value.toLowerCase()||'';const filtroFecha=document.getElementById('filterReservaFecha')?.value||'';if(filtroBarberia)reservas=reservas.filter(r=>(r.barberia_nombre||'').toLowerCase().includes(filtroBarberia));if(filtroCliente)reservas=reservas.filter(r=>(r.cliente_nombre||'').toLowerCase().includes(filtroCliente));if(filtroFecha)reservas=reservas.filter(r=>r.fecha===filtroFecha);reservas.sort((a,b)=>{let valA,valB;if(reservasSortColumn==="fecha"){valA=a.fecha||"";valB=b.fecha||"";}else if(reservasSortColumn==="barberia"){valA=a.barberia_nombre||"";valB=b.barberia_nombre||"";}else{valA=a.precio||0;valB=b.precio||0;}if(valA<valB)return reservasSortDirection==="asc"?-1:1;if(valA>valB)return reservasSortDirection==="asc"?1:-1;return 0;});renderReservasGlobal(reservas);}
+function renderReservasGlobal(reservas){const c=document.getElementById("reservasGlobalList");if(!reservas.length){c.innerHTML="<p class='loading'>No hay reservas en el sistema</p>";return}c.innerHTML=reservas.map(r=>`<div class="reserva-card"><div class="reserva-info"><div class="reserva-item"><span class="reserva-item-label">🏪 BARBERÍA</span><span class="reserva-item-value"><strong>${r.barberia_nombre||'---'}</strong></span></div><div class="reserva-item"><span class="reserva-item-label">✂️ BARBERO</span><span class="reserva-item-value">${r.barbero_nombre||'---'}</span></div><div class="reserva-item"><span class="reserva-item-label">💈 SERVICIO</span><span class="reserva-item-value">${r.servicio_nombre||'---'}</span></div><div class="reserva-item"><span class="reserva-item-label">👤 CLIENTE</span><span class="reserva-item-value">${r.cliente_nombre||r.cliente_uid?.substring(0,8)||'---'}</span></div><div class="reserva-item"><span class="reserva-item-label">📅 FECHA</span><span class="reserva-item-value">${r.fecha||'---'}</span></div><div class="reserva-item"><span class="reserva-item-label">🕐 HORA</span><span class="reserva-item-value">${r.hora||'---'}</span></div><div class="reserva-item"><span class="reserva-item-label">💰 PRECIO</span><span class="reserva-item-value reserva-precio">$${r.precio||0}</span></div><div class="reserva-item"><span class="reserva-item-label">📌 ESTADO</span><span class="reserva-estado">${r.estado==='completada'?'Completada':r.estado==='cancelada'?'Cancelada':'Confirmada'}</span></div></div></div>`).join("");}
+document.querySelectorAll('.sort-chip[data-sort-reservas]').forEach(chip=>{chip.addEventListener('click',()=>{const col=chip.dataset.sortReservas;if(reservasSortColumn===col){reservasSortDirection=reservasSortDirection==="asc"?"desc":"asc";}else{reservasSortColumn=col;reservasSortDirection=col==="fecha"?"desc":"asc";}aplicarFiltrosReservas();document.querySelectorAll('.sort-chip[data-sort-reservas]').forEach(c=>c.classList.remove('active'));chip.classList.add('active');});});
+document.getElementById('filterReservaBarberia')?.addEventListener('input',()=>aplicarFiltrosReservas());
+document.getElementById('filterReservaCliente')?.addEventListener('input',()=>aplicarFiltrosReservas());
+document.getElementById('filterReservaFecha')?.addEventListener('change',()=>aplicarFiltrosReservas());
+document.getElementById('limpiarFiltrosReservasBtn')?.addEventListener('click',()=>{if(document.getElementById('filterReservaBarberia'))document.getElementById('filterReservaBarberia').value='';if(document.getElementById('filterReservaCliente'))document.getElementById('filterReservaCliente').value='';if(document.getElementById('filterReservaFecha'))document.getElementById('filterReservaFecha').value='';aplicarFiltrosReservas();});
+function openEditBarberiaModal(b){document.getElementById('editBarberiaId').value=b.id;document.getElementById('editBarberiaNombre').value=b.nombre||'';document.getElementById('editBarberiaDireccion').value=b.direccion||'';document.getElementById('editBarberiaTelefono').value=b.telefono||'';document.getElementById('editBarberiaEmail').value=b.email||'';document.getElementById('editBarberiaHorario').value=b.horario||'';document.getElementById('editBarberiaActiva').value=b.activa!==false?'true':'false';document.getElementById('editBarberiaModal').style.display='flex';}
+async function saveBarberiaEdit(){const id=document.getElementById('editBarberiaId').value;await updateDoc(doc(db,"barberias",id),{nombre:document.getElementById('editBarberiaNombre').value,direccion:document.getElementById('editBarberiaDireccion').value,telefono:document.getElementById('editBarberiaTelefono').value,email:document.getElementById('editBarberiaEmail').value,horario:document.getElementById('editBarberiaHorario').value,activa:document.getElementById('editBarberiaActiva').value==='true'});document.getElementById('editBarberiaModal').style.display='none';showToast("Barbería actualizada","success");}
+async function eliminarDueñoCompleto(){if(!duenoParaEliminar)return;const btn=document.getElementById('confirmDeleteBtn');btn.disabled=true;btn.textContent='Eliminando...';try{if(duenoParaEliminar.barberiaId&&duenoParaEliminar.barberiaId!=='undefined'){const bid=duenoParaEliminar.barberiaId;const resSnap=await getDocs(query(collection(db,"reservas"),where("barberiaId","==",bid)));for(const d of resSnap.docs)await deleteDoc(d.ref);const barSnap=await getDocs(query(collection(db,"barberos"),where("barberiaId","==",bid)));for(const d of barSnap.docs)await deleteDoc(d.ref);const serSnap=await getDocs(query(collection(db,"servicios"),where("barberiaId","==",bid)));for(const d of serSnap.docs)await deleteDoc(d.ref);await deleteDoc(doc(db,"barberias",bid));}if(duenoParaEliminar.docId)await deleteDoc(doc(db,"usuarios",duenoParaEliminar.docId));showToast(`✅ Dueño "${duenoParaEliminar.nombre}" eliminado correctamente`,"success");}catch(e){showToast("Error al eliminar: "+e.message,"error");}finally{btn.disabled=false;btn.textContent='Eliminar Permanentemente';document.getElementById('deleteDuenoModal').style.display='none';duenoParaEliminar=null;}}
+function updateGlobalStats(){document.getElementById("totalBarberias").innerText=allBarberias.length;document.getElementById("totalDueños").innerText=allDueños.length;document.getElementById("totalReservasGlobal").innerText=allReservasGlobal.length;const clientesUnicos=new Set();allReservasGlobal.forEach(r=>{if(r.cliente_uid)clientesUnicos.add(r.cliente_uid);});document.getElementById("totalClientesGlobal").innerText=clientesUnicos.size;}
+document.getElementById('crearBarberiaYDuenoBtn')?.addEventListener('click',async()=>{const bn=document.getElementById('nuevaBarberiaNombre').value,de=document.getElementById('nuevoDuenoEmail').value,dp=document.getElementById('nuevoDuenoPassword').value,dn=document.getElementById('nuevoDuenoNombre').value;if(!bn||!de||!dp||!dn){showToast("Completa los campos obligatorios (*)","error");return}if(dp.length<6){showToast("La contraseña debe tener al menos 6 caracteres","error");return}const btn=document.getElementById('crearBarberiaYDuenoBtn');btn.disabled=true;btn.textContent='Creando...';try{const barData={nombre:bn,direccion:document.getElementById('nuevaBarberiaDireccion').value,telefono:document.getElementById('nuevaBarberiaTelefono').value,email:document.getElementById('nuevaBarberiaEmail').value,horario:document.getElementById('nuevaBarberiaHorario').value,activa:true,createdAt:new Date().toISOString()};const barRef=await addDoc(collection(db,"barberias"),barData);const barId=barRef.id;let uid;try{const uc=await createUserWithEmailAndPassword(auth,de,dp);uid=uc.user.uid;}catch(e){if(e.code==='auth/email-already-in-use'){showToast("El email del dueño ya existe","error");await deleteDoc(doc(db,"barberias",barId));return}throw e;}await addDoc(collection(db,"usuarios"),{uid:uid,nombre:dn,email:de,rol:"dueño",barberiaId:barId,createdAt:new Date()});showToast(`✅ Dueño "${dn}" creado exitosamente`,"success");showToast(`📧 Email: ${de} | 🔑 Contraseña: ${dp}`,"info");document.getElementById('nuevaBarberiaNombre').value='';document.getElementById('nuevaBarberiaDireccion').value='';document.getElementById('nuevaBarberiaTelefono').value='';document.getElementById('nuevaBarberiaEmail').value='';document.getElementById('nuevaBarberiaHorario').value='';document.getElementById('nuevoDuenoNombre').value='';document.getElementById('nuevoDuenoEmail').value='';document.getElementById('nuevoDuenoPassword').value='';}catch(e){showToast("Error: "+e.message,"error");}finally{btn.disabled=false;btn.textContent='✅ Crear Barbería y Dueño';}});
+document.getElementById('closeEditModalBtn')?.addEventListener('click',()=>{document.getElementById('editBarberiaModal').style.display='none';});
+document.getElementById('saveBarberiaEditBtn')?.addEventListener('click',saveBarberiaEdit);
+document.getElementById('closeDeleteModalBtn')?.addEventListener('click',()=>{document.getElementById('deleteDuenoModal').style.display='none';duenoParaEliminar=null;});
+document.getElementById('confirmDeleteBtn')?.addEventListener('click',eliminarDueñoCompleto);
+window.addEventListener('click',(e)=>{if(e.target===document.getElementById('editBarberiaModal'))document.getElementById('editBarberiaModal').style.display='none';if(e.target===document.getElementById('deleteDuenoModal'))document.getElementById('deleteDuenoModal').style.display='none';});
+onAuthStateChanged(auth,async(u)=>{if(u&&!currentUser){const snap=await getDocs(query(collection(db,"usuarios"),where("uid","==",u.uid)));if(!snap.empty){const d=snap.docs[0].data();if(d.rol==="superadmin"){currentUser={email:u.email,nombre:d.nombre};document.getElementById("userName").innerText=currentUser.nombre;document.getElementById("authScreen").style.display="none";document.getElementById("panelContent").style.display="block";iniciarEscuchaBarberias();iniciarEscuchaReservas();iniciarEscuchaDueños();}}}});
+
+// Registrar Service Worker
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+            .then(registration => {
+                console.log('ServiceWorker registrado con éxito:', registration.scope);
+            })
+            .catch(error => {
+                console.log('Error al registrar ServiceWorker:', error);
+            });
+    });
+}
+</script>
+</body>
+</html>
