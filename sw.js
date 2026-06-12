@@ -1,19 +1,19 @@
-const CACHE_NAME = 'barberapp-superadmin-v2.0.1';
+const CACHE_NAME = 'barberapp-superadmin-v2.0.2';
 const OFFLINE_URL = '/offline.html';
 
-// Recursos a cachear durante la instalación (solo iconos que existen)
+// Recursos a cachear durante la instalación
 const PRECACHE_URLS = [
   '/',
   '/index.html',
   '/manifest.json',
   OFFLINE_URL,
-  '/icon-96.png',
-  '/icon-128.png',
-  '/icon-144.png',
-  '/icon-152.png',
-  '/icon-192.png',
-  '/icon-384.png',
-  '/icon-512.png'
+  '/icons/icon-96.png',
+  '/icons/icon-128.png',
+  '/icons/icon-144.png',
+  '/icons/icon-152.png',
+  '/icons/icon-192.png',
+  '/icons/icon-384.png',
+  '/icons/icon-512.png'
 ];
 
 // Instalación
@@ -28,6 +28,12 @@ self.addEventListener('install', event => {
       .then(() => self.skipWaiting())
       .catch(error => {
         console.error('[ServiceWorker] Error al cachear:', error);
+        // Intentar cachear individualmente cada recurso
+        PRECACHE_URLS.forEach(url => {
+          caches.open(CACHE_NAME).then(cache => {
+            cache.add(url).catch(e => console.warn(`No se pudo cachear: ${url}`, e));
+          });
+        });
       })
   );
 });
@@ -88,7 +94,7 @@ self.addEventListener('fetch', event => {
         }).catch(() => {
           // Si es un icono y no hay cache, devolver un placeholder
           if (url.pathname.includes('icon-')) {
-            return caches.match('/icon-96.png');
+            return caches.match('/icons/icon-96.png');
           }
           return new Response('Icono no disponible', { status: 404 });
         });
